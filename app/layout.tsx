@@ -1,3 +1,7 @@
+import '@/app/ui/global.css'
+import { onest } from '@/app/ui/fonts';
+
+
 export default function RootLayout({
   children,
 }: {
@@ -5,7 +9,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body>{children}</body>
+      <body className={`${onest.className} antialiased`}>{children}</body>
     </html>
   );
 }
