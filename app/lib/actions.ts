@@ -5,6 +5,7 @@ import { revalidatePath } from 'next/cache'
 import { redirect } from 'next/navigation'
 import { revalidateTag } from 'next/cache'
 
+export const dynamic = 'force-dynamic'
 
 const FormSchema = z.object({
   id: z.string(),
