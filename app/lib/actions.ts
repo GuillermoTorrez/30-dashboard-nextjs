@@ -5,8 +5,6 @@ import { revalidatePath } from 'next/cache'
 import { redirect } from 'next/navigation'
 import { revalidateTag } from 'next/cache'
 
-export const dynamic = 'force-dynamic'
-
 const FormSchema = z.object({
   id: z.string(),
   customerId: z.string(),
@@ -47,7 +45,12 @@ export async function updateInvoice(id: string, formData: FormData) {
     UPDATE invoices
     SET customer_id = ${customerId}, amount = ${amountInCents}, status = ${status}
     WHERE id = ${id}
-  `
+  `,
+    {
+      next: {
+        revalidate: 0,
+      },
+    }
 
   revalidateTag('invoices')
   revalidatePath('/dashboard/invoices')
