@@ -3,6 +3,8 @@ import { z } from 'zod'
 import { sql } from '@vercel/postgres'
 import { revalidatePath } from 'next/cache'
 import { redirect } from 'next/navigation'
+import { revalidateTag } from 'next/cache'
+
 
 const FormSchema = z.object({
   id: z.string(),
@@ -46,6 +48,7 @@ export async function updateInvoice(id: string, formData: FormData) {
     WHERE id = ${id}
   `
 
+  revalidateTag('invoices')
   revalidatePath('/dashboard/invoices')
   redirect('/dashboard/invoices')
 }
