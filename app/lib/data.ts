@@ -19,7 +19,7 @@ export async function fetchRevenue() {
 
     const data = await sql<Revenue>`SELECT * FROM revenue`
 
-   /*  console.log('Data fetch completed after 3 seconds.') */
+    /*  console.log('Data fetch completed after 3 seconds.') */
 
     return data.rows
   } catch (error) {
@@ -55,21 +55,31 @@ export async function fetchCardData() {
     // how to initialize multiple queries in parallel with JS.
     const invoiceCountPromise = sql`SELECT COUNT(*) FROM invoices`
     const customerCountPromise = sql`SELECT COUNT(*) FROM customers`
-    const invoiceStatusPromise = sql`SELECT
+    const totalPaidPromise = sql`SELECT SUM(amount) AS total FROM invoices WHERE status = 'paid'`
+    const totalPendingPromise = sql`SELECT SUM(amount) AS total FROM invoices WHERE status = 'pending'`
+
+    {
+      /* const invoiceStatusPromise = sql`SELECT
          SUM(CASE WHEN status = 'paid' THEN amount ELSE 0 END) AS "paid",
          SUM(CASE WHEN status = 'pending' THEN amount ELSE 0 END) AS "pending"
-         FROM invoices`
+         FROM invoices` */
+    }
 
     const data = await Promise.all([
       invoiceCountPromise,
       customerCountPromise,
-      invoiceStatusPromise,
+      totalPaidPromise,
+      totalPendingPromise,
+      //invoiceStatusPromise,
     ])
 
     const numberOfInvoices = Number(data[0].rows[0].count ?? '0')
     const numberOfCustomers = Number(data[1].rows[0].count ?? '0')
-    const totalPaidInvoices = formatCurrency(data[2].rows[0].paid ?? '0')
-    const totalPendingInvoices = formatCurrency(data[2].rows[0].pending ?? '0')
+    const totalPaidInvoices = formatCurrency(data[2].rows[0].total ?? '0')
+    const totalPendingInvoices = formatCurrency(data[3].rows[0].total ?? '0')
+
+    //const totalPaidInvoices = formatCurrency(data[2].rows[0].paid ?? '0')
+    //const totalPendingInvoices = formatCurrency(data[2].rows[0].pending ?? '0')
 
     return {
       numberOfCustomers,
@@ -82,8 +92,6 @@ export async function fetchCardData() {
     throw new Error('Failed to fetch card data.')
   }
 }
-
-
 
 const ITEMS_PER_PAGE = 8
 export async function fetchFilteredInvoices(
